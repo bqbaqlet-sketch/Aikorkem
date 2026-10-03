@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aikorkem </title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#ffd1dc;--bg2:#ff8fab;--ink:#5a1230;--rose:#e0245e;--card:rgba(255,255,255,.72)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;font-family:Nunito,system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2))}
+#hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.h{position:absolute;bottom:-40px;animation:up linear forwards;opacity:.7}
+@keyframes up{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+#track{position:relative;z-index:1;height:100%;transition:transform 1.6s cubic-bezier(.65,0,.25,1)}
+.scene{height:100vh;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:22px;overflow-y:auto}
+h1,.big{font-family:Pacifico,cursive;font-weight:400;font-size:clamp(2rem,9vw,3.4rem);line-height:1.25;color:var(--rose);text-shadow:0 2px 0 #fff8}
+.txt{font-size:clamp(1.3rem,5.5vw,1.9rem);font-weight:700;max-width:560px;animation:fade .9s}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}}
+button{font:700 1.1rem Nunito,sans-serif;border:0;border-radius:40px;padding:14px 34px;background:var(--rose);color:#fff;box-shadow:0 8px 20px #e0245e55;cursor:pointer;transition:transform .2s}
+button:active{transform:scale(.94)}
+button.alt{background:#fff;color:var(--rose);box-shadow:0 4px 12px #0002}
+button:disabled{opacity:.4}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+#list{max-height:62dvh;overflow-y:auto;width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px;padding:8px;scroll-behavior:smooth}
+#list p{background:var(--card);border-radius:18px;padding:12px 16px;font-weight:700;animation:fade .8s}
+textarea{width:min(100%,460px);height:110px;border-radius:18px;border:2px solid #fff;padding:12px;font:inherit;resize:none}
+#no{transition:left .25s,top .25s}
+.loupe{font-size:3.2rem;display:inline-block;animation:srch 1.6s ease-in-out infinite}
+@keyframes srch{0%,100%{transform:translate(-30px,0) rotate(-15deg)}50%{transform:translate(30px,-10px) rotate(15deg)}}
+.bar{width:220px;height:8px;background:#fff9;border-radius:8px;overflow:hidden;margin:0 auto}
+.bar i{display:block;height:100%;width:0;background:var(--rose);transition:width 10s linear}
+.hall{background:var(--card);border-radius:22px;padding:14px;width:100%;max-width:540px}
+.hall b{font-family:Pacifico,cursive;color:var(--rose);font-size:1.4rem;font-weight:400}
+.s{display:flex;gap:12px;width:100%;text-align:left;background:#fff;color:var(--ink);box-shadow:none;border-radius:14px;padding:10px 14px;margin-top:8px;font-size:1rem}
+.s span{color:var(--rose);min-width:52px}
+.s.on{background:var(--rose);color:#fff}.s.on span{color:#fff}
+#end{position:fixed;inset:0;z-index:5;background:#000;opacity:0;pointer-events:none;display:flex;align-items:center;justify-content:center;transition:opacity 5s}
+#end.on{opacity:1;pointer-events:auto}
+#end h1{color:#fff;text-shadow:none;opacity:0;transition:opacity 3s 3s}
+#end.on h1{opacity:1}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div id="hearts"></div>
+<audio id="song" src="music.mp3" loop preload="auto"></audio>
+
+<div id="track">
+  <section class="scene" id="s0">
+    <div style="font-size:4rem">💌</div>
+    <h1>Привет моя зайка,</h1>
+    <button id="b0">Далее</button>
+  </section>
+
+  <section class="scene" id="s1">
+    <div id="list"></div>
+    <button id="b1" hidden>Привет</button>
+  </section>
+
+  <section class="scene" id="s2">
+    <div class="big">Как настроение?</div>
+    <div class="row">
+      <button data-m="Отлично" data-g="1">Отлично</button>
+      <button data-m="Хорошо" data-g="1">Хорошо</button>
+      <button data-m="Не очень" data-g="0">Не очень</button>
+      <button data-m="Плохо" data-g="0">Плохо</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s3">
+    <div class="txt" id="mt"></div>
+    <textarea id="why" hidden placeholder="Расскажи мне…"></textarea>
+    <button id="b3">Далее</button>
+  </section>
+
+  <section class="scene" id="s4">
+    <div class="big" id="dt"></div>
+    <div class="row" id="db"></div>
+  </section>
+
+  <section class="scene" id="s5">
+    <div class="txt">Рад что ты согласилась, давай посмотрим какие сегодня у нас кино</div>
+    <div id="search"><div class="loupe">🔍</div><div class="bar"><i id="pb"></i></div></div>
+    <div id="sched" hidden style="width:100%;display:none;flex-direction:column;align-items:center;gap:14px"></div>
+  </section>
+</div>
+
+<div id="end"><h1>The End</h1></div>
+
+<script>
+/* ====== НАСТРОЙКИ ====== */
+const BOT_TOKEN = "8674071450:AAFeE_pe-Gbxh3OlwqMG-JaMXyISrW07NX0";
+const CHAT_ID   = "5958599418";
+/* ======================= */
+
+const $ = id => document.getElementById(id);
+let step = 0, noTries = 0;
+
+function tg(text){
+  if(BOT_TOKEN.startsWith("ВСТАВЬ")) { console.log("TG:", text); return; }
+  fetch("https://api.telegram.org/bot"+BOT_TOKEN+"/sendMessage?chat_id="+CHAT_ID+"&text="+encodeURIComponent(text)).catch(()=>{});
+}
+function go(n){ step=n; $("track").style.transform="translateY(-"+(n*100)+"dvh)"; }
+
+/* сердечки */
+const em=["💖","💕","💗","🌸","💘","❤️"];
+setInterval(()=>{
+  const h=document.createElement("div");h.className="h";h.textContent=em[Math.random()*em.length|0];
+  h.style.left=Math.random()*100+"vw";h.style.fontSize=(16+Math.random()*28)+"px";
+  h.style.animationDuration=(7+Math.random()*6)+"s";
+  $("hearts").appendChild(h);setTimeout(()=>h.remove(),13000);
+},500);
+
+tg("👀 Она открыла сайт");
+
+/* 0 -> 1 */
+const comps=["Любимая 💗","Хорошая","Удивительная","Невероятно добрая","Пидорасина","Пидорасина","Котакбасина","Пантера ебучая","Анимешная хуила","Месячные бля","Не умеешь шутить бля","Ладно,","На самом деле ты","Ахуительна","Ослепительна","Вип казашка ебучая","шшс бля","спрос болад сенен","дабро берщ","Игнорщица бля"];
+$("b0").onclick=()=>{
+  $("song").play().catch(()=>{});
+  go(1);
+  let i=0;
+  setTimeout(function next(){
+    if(i<comps.length){
+      const p=document.createElement("p");p.textContent=comps[i++];
+      $("list").appendChild(p);$("list").scrollTop=1e5;
+      setTimeout(next,950);
+    } else $("b1").hidden=false;
+  },1800);
+};
+$("b1").onclick=()=>go(2);
+
+/* настроение */
+document.querySelectorAll("#s2 [data-m]").forEach(b=>b.onclick=()=>{
+  const good=b.dataset.g==="1";
+  tg("Настроение: "+b.dataset.m);
+  $("mt").textContent=good?"Рад что у тебя всё неплохо 😊":"Почему? Расскажешь?";
+  $("why").hidden=good;
+  $("b3").textContent=good?"Далее":"Отправить";
+  $("b3").dataset.bad=good?"":"1";
+  go(3);
+});
+$("b3").onclick=()=>{
+  if($("b3").dataset.bad) tg("Она рассказала почему плохо:\n"+($("why").value||"(ничего не написала)"));
+  go(4);showLine(0);
+};
+
+/* диалог */
+const lines=[["Слушай..","Далее"],["Давно хотел тебе сказать","Говори"],["Вообщем,","Далее"],["Вообщем, давай в кино сегодня",null]];
+function showLine(i){
+  const [t,b]=lines[i];
+  $("dt").textContent=t;$("dt").style.animation="none";void $("dt").offsetWidth;$("dt").style.animation="fade .9s";
+  const row=$("db");row.innerHTML="";
+  if(b){const x=document.createElement("button");x.textContent=b;x.onclick=()=>showLine(i+1);row.appendChild(x);}
+  else{
+    const y=document.createElement("button");y.textContent="Пошли";y.onclick=yes;
+    const n=document.createElement("button");n.textContent="Нет";n.id="no";n.className="alt";
+    const run=e=>{
+      e.preventDefault();
+      if(!noTries++) tg("😏 Она пытается нажать «Нет»");
+      n.style.position="fixed";
+      n.style.left=Math.random()*(innerWidth-110)+"px";
+      n.style.top=Math.random()*(innerHeight-60)+"px";
+    };
+    n.addEventListener("mouseenter",run);n.addEventListener("touchstart",run,{passive:false});n.addEventListener("click",run);
+    row.append(y,n);
+  }
+}
+
+/* поиск и расписание */
+const halls={"1 зал":[["10:00","Бомж (Байдын ойламаған мекен-жайы)"],["11:40","Сердце зверя"],["13:25","7 қарақшы"],["15:35","Диггер"],["18:00","Сердце зверя"],["20:05","7 қарақшы"],["22:25","Жарығым-ай"]],
+"2 зал":[["10:00","Приключения мамонтёнка. В поисках мамы"],["11:30","Обитель зла"],["13:20","25 теңге. Басты миссия"],["15:15","Приключения мамонтёнка. В поисках мамы"],["17:00","Обитель зла"],["19:00","Бомж (Байдын ойламаған мекен-жайы)"],["20:50","25 теңге. Басты миссия"],["22:45","Диггер"]]};
+function yes(){
+  tg("🎉 Она нажала «Пошли»! (попыток нажать «Нет»: "+noTries+")");
+  go(5);
+  setTimeout(()=>$("pb").style.width="100%",1700);
+  setTimeout(buildSched,11800);
+}
+function buildSched(){
+  $("search").style.display="none";
+  const box=$("sched");box.style.display="flex";box.hidden=false;
+  let pick=null;
+  const ok=document.createElement("button");ok.textContent="Подтвердить";ok.disabled=true;
+  for(const [h,arr] of Object.entries(halls)){
+    const d=document.createElement("div");d.className="hall";d.innerHTML="<b>"+h+"</b>";
+    arr.forEach(([t,n])=>{
+      const s=document.createElement("button");s.className="s";s.innerHTML="<span>"+t+"</span>"+n;
+      s.onclick=()=>{box.querySelectorAll(".s").forEach(x=>x.classList.remove("on"));s.classList.add("on");pick={h,t,n};ok.disabled=false;};
+      d.appendChild(s);
+    });
+    box.appendChild(d);
+  }
+  const no=document.createElement("button");no.className="alt";no.textContent="Ни один фильм мне не нравится, подождать другие сеансы";
+  ok.onclick=()=>{
+    tg("🎬 Выбрала: «"+pick.n+"» в "+pick.t+" ("+pick.h+")");
+    finish("Отличный выбор. Увидимся до "+pick.t+" 💕");
+  };
+  no.onclick=()=>{tg("😔 Ни один фильм не понравился, ждёт другие сеансы");finish("Очень жаль. Ладно, еще увидимся");};
+  box.append(ok,no);
+}
+function finish(msg){
+  $("sched").innerHTML='<div class="txt">'+msg+'</div>';
+  setTimeout(()=>$("end").classList.add("on"),3500);
+}
+</script>
+</body>
+</html>
